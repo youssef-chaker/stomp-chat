@@ -24,7 +24,6 @@ public class controller {
         return "hi";
     }
 
-    @MessageMapping("/messages")
     @SendToUser("/queue/messages")
     public String message(@Payload String message) {
         System.out.println(message);

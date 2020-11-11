@@ -34,16 +34,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app")
-                .setUserDestinationPrefix("/user")
+//                .setUserDestinationPrefix("/user") //not necessary (don't know why ! why why why ya wkhayeni)
                 .enableSimpleBroker("/topic","/queue");
     }
-
 }
 
 class handshakeHandler extends DefaultHandshakeHandler {
-    private int id = 1;
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        return () -> ""+id++;
+        return () -> request.getURI().getQuery();
     }
 }

@@ -7,32 +7,46 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js" integrity="sha512-5yJ548VSnLflcRxWNqVWYeQZnby8D8fJTmYRLyvs445j1XmzR8cnWi85lcHx3CUEeAX+GrK3TqTfzOO6LKDpdw==" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g==" crossorigin="anonymous"></script>
 <body>
+username:
+<input type="text">
+<button>connect</button>
+<br><hr><br>
+
 message:
 <input id="message" type="text">
 recipient:
 <input id="recipient" type="text">
-<button>send</button>
+<button id="message-button">send</button>
 <br><br><hr><br><br>
 <div id="messages">
 
 </div>
 </body>
 <script>
-    const socket = new SockJS("http://localhost:8080/handshake");
-    const stompClient = Stomp.over(socket);
-    stompClient.connect(frame => {
-        stompClient.subscribe("/user/queue/messages",greeting => {
-            console.log(greeting);
+    let socket,stompClient;
+    document.querySelector("button").addEventListener("click",e=> {
+        const username = document.querySelector("input").value;
+        socket = new SockJS(`http://localhost:8080/handshake?${username}`);
+        stompClient = Stomp.over(socket);
+        stompClient.connect({},frame => {
+            stompClient.subscribe("/user/queue/messages",message => {
+                console.log(message);
+            })
         })
     })
-    document.querySelector("button").addEventListener("click",e => {
+
+    document.querySelector("#message-button").addEventListener("click",e => {
         let recipient = document.querySelector("#recipient").value;
         let message = document.querySelector("#message").value;
         stompClient.send(`/user/${recipient}/queue/messages`,{},message);
     })
 
-    const stompClient2 = Stomp.over(socket);
-    stompClient2.connect()
+    // const stompClient2 = Stomp.over(socket);
+    // stompClient2.connect({},frame => {
+    //     stompClient2.subscribe("/topic/greetings",greeting => {
+    //         console.log(greeting);
+    //     })
+    // })
 
 </script>
 </html>
